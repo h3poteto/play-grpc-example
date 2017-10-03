@@ -73,6 +73,7 @@ class GrpcServer(executionContext: ExecutionContext) { self =>
     }
 
     override def list(request: RequestType, stream: StreamObserver[CwUserId]) = {
+      Thread.sleep(10000)
       for (u <- users) {
         stream.onNext(u)
       }
