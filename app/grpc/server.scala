@@ -4,7 +4,7 @@ import com.google.inject.{ Guice, Injector }
 import play.Logger
 import io.grpc.{Server, ServerBuilder, Status, StatusException, ServerInterceptors}
 import io.grpc.stub.StreamObserver
-import grpc.errorhandler.ErrorHandler
+import grpc.interceptors.{ErrorHandler, Logging}
 import users.users.{RequestType, CwUserId, UsersGrpc}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,7 +48,8 @@ class GrpcServer(executionContext: ExecutionContext) { self =>
     server = ServerBuilder.forPort(port).addService(
       ServerInterceptors.intercept(
         UsersGrpc.bindService(new UsersImpl, executionContext),
-        new ErrorHandler
+        new ErrorHandler,
+        new Logging
       )
     ).build.start
     Logger.info("gRPC server started, listening on " + port)

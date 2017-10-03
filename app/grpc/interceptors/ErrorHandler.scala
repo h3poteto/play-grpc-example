@@ -1,4 +1,4 @@
-package grpc.errorhandler
+package grpc.interceptors
 
 // https://github.com/grpc/grpc-java/blob/166108a9438c22d06eb3b371b5ad34a75e14787c/examples/src/main/java/io/grpc/examples/header/HeaderServerInterceptor.java
 // http://blog.soushi.me/entry/2017/08/18/234615
