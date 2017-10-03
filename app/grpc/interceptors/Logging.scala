@@ -13,7 +13,7 @@ class Logging() extends ServerInterceptor {
     requestHeaders: Metadata,
     next: ServerCallHandler[ReqT, RespT]): ServerCall.Listener[ReqT] = {
 
-    Logger.info(call.getAttributes().toString() + ", " + call.getMethodDescriptor().getFullMethodName())
+    Logger.info(requestHeaders.toString() + ", " + call.getAttributes().toString() + ", " + call.getMethodDescriptor().getFullMethodName())
     return next.startCall(call, requestHeaders)
   }
 }
