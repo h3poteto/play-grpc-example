@@ -2,7 +2,7 @@ package grpc
 
 import com.google.inject.{ Guice, Injector }
 import play.Logger
-import io.grpc.{Server, ServerBuilder, Status, StatusException}
+import io.grpc.{Server, ServerBuilder, Status, StatusException, ServerInterceptors}
 import io.grpc.stub.StreamObserver
 import grpc.errorhandler.ErrorHandler
 import users.users.{RequestType, CwUserId, UsersGrpc}
@@ -45,12 +45,17 @@ class GrpcServer(executionContext: ExecutionContext) { self =>
   private var users: Array[CwUserId] = Array.empty
 
   def start(): Unit = {
-    server = ServerBuilder.forPort(port).addService(UsersGrpc.bindService(new UsersImpl, executionContext)).intercept(new ErrorHandler()).build.start
-    Logger.info("Server started, listening on " + port)
+    server = ServerBuilder.forPort(port).addService(
+      ServerInterceptors.intercept(
+        UsersGrpc.bindService(new UsersImpl, executionContext),
+        new ErrorHandler
+      )
+    ).build.start
+    Logger.info("gRPC server started, listening on " + port)
     sys.addShutdownHook {
       Logger.info("*** shutting down gPRC server since JVM is shutting down")
       self.stop()
-      Logger.info("*** server shutdown")
+      Logger.info("*** gRPC server shutdown")
     }
   }
 
