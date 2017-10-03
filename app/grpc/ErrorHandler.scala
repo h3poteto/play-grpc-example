@@ -41,7 +41,7 @@ class ErrorHandler() extends ServerInterceptor {
     requestHeaders: Metadata,
     ex: Exception) = {
     Logger.error(ex.getMessage)
-    call.close(Status.fromCode(Status.INTERNAL.getCode()).withDescription(ex.getMessage), requestHeaders)
+    call.close(Status.Code.CANCELLED.toStatus(), requestHeaders)
   }
 }
 
