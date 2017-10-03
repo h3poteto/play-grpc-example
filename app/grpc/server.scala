@@ -5,7 +5,7 @@ import play.Logger
 import io.grpc.{Server, ServerBuilder, Status, StatusException}
 import io.grpc.stub.StreamObserver
 import grpc.errorhandler.ErrorHandler
-import users.users.{CwUserId, UsersGrpc}
+import users.users.{RequestType, CwUserId, UsersGrpc}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
@@ -42,6 +42,7 @@ class RunnerImpl @Inject() (actorSystem: ActorSystem)(implicit exec: ExecutionCo
 class GrpcServer(executionContext: ExecutionContext) { self =>
   private val port = sys.env.getOrElse("SERVER_PORT", "50051").asInstanceOf[String].toInt
   private[this] var server: Server = null
+  private var users: Array[CwUserId] = Array.empty
 
   def start(): Unit = {
     server = ServerBuilder.forPort(port).addService(UsersGrpc.bindService(new UsersImpl, executionContext)).intercept(new ErrorHandler()).build.start
@@ -66,8 +67,16 @@ class GrpcServer(executionContext: ExecutionContext) { self =>
   }
 
   private class UsersImpl extends UsersGrpc.Users {
-    override def create(request: users.users.CwUserId): scala.concurrent.Future[users.users.CwUserId] = {
+    override def create(request: CwUserId): scala.concurrent.Future[CwUserId] = {
+      users = users :+ request
       Future.successful(request)
+    }
+
+    override def list(request: RequestType, stream: StreamObserver[CwUserId]) = {
+      for (u <- users) {
+        stream.onNext(u)
+      }
+      stream.onCompleted()
     }
   }
 }

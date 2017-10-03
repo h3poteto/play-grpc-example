@@ -5,6 +5,10 @@ package users;
 
 service Users {
   rpc Create(CwUserId) returns (CwUserId) {};
+  rpc List(RequestType) returns (stream CwUserId) {};
+}
+
+message RequestType {
 }
 
 message CwUserId {
