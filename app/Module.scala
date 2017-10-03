@@ -1,4 +1,5 @@
 import com.google.inject.AbstractModule
+import grpc.{Runner, RunnerImpl}
 
 /**
  * This class is a Guice module that tells Guice how to bind several
@@ -11,5 +12,6 @@ import com.google.inject.AbstractModule
  */
 class Module extends AbstractModule {
   override def configure(): Unit = {
+    bind(classOf[Runner]).to(classOf[RunnerImpl]).asEagerSingleton
   }
 }

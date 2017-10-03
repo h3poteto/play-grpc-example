@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package users;
+
+
+service Users {
+  rpc Create(CwUserId) returns (CwUserId) {};
+}
+
+message CwUserId {
+  int64 id = 1;
+}
