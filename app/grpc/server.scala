@@ -1,12 +1,13 @@
 package grpc
 
 import com.google.inject.{ Guice, Injector }
-import play.Logger
 import io.grpc.{Server, ServerBuilder, Status, StatusRuntimeException, ServerInterceptors}
 import io.grpc.stub.StreamObserver
 import io.grpc.util._
-import grpc.interceptors.{ErrorHandler, Logging}
+
 import users.users.{RequestType, CwUserId, UsersGrpc}
+import grpc.interceptors.{ErrorHandler, Logging}
+import grpc.util.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
@@ -49,8 +50,8 @@ class GrpcServer(executionContext: ExecutionContext) { self =>
     server = ServerBuilder.forPort(port).addService(
       ServerInterceptors.intercept(
         UsersGrpc.bindService(new UsersImpl, executionContext),
-        new ErrorHandler,
         new Logging,
+        new ErrorHandler,
         TransmitStatusRuntimeExceptionInterceptor.instance()
       )
     ).build.start
@@ -76,6 +77,7 @@ class GrpcServer(executionContext: ExecutionContext) { self =>
 
   private class UsersImpl extends UsersGrpc.Users {
     override def create(request: CwUserId): scala.concurrent.Future[CwUserId] = {
+      Logger.info("writing")
       users = users :+ request
       Future.successful(request)
     }

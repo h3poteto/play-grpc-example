@@ -7,8 +7,7 @@ package grpc.interceptors
 // https://github.com/grpc/grpc-java/blob/d387bfe72fff7b89f2cf7ce09bca418feb322085/stub/src/main/java/io/grpc/stub/ServerCalls.java#L345
 
 import io.grpc.{ForwardingServerCall, ForwardingServerCallListener, Metadata, ServerCall, ServerCallHandler, ServerInterceptor, Status, StatusRuntimeException}
-import play.Logger
-
+import grpc.util.Logger
 
 class ErrorHandler extends ServerInterceptor {
   override def interceptCall[ReqT, RespT](
