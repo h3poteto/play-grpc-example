@@ -2,8 +2,9 @@ package grpc
 
 import com.google.inject.{ Guice, Injector }
 import play.Logger
-import io.grpc.{Server, ServerBuilder, Status, StatusException, ServerInterceptors}
+import io.grpc.{Server, ServerBuilder, Status, StatusRuntimeException, ServerInterceptors}
 import io.grpc.stub.StreamObserver
+import io.grpc.util._
 import grpc.interceptors.{ErrorHandler, Logging}
 import users.users.{RequestType, CwUserId, UsersGrpc}
 
@@ -49,7 +50,8 @@ class GrpcServer(executionContext: ExecutionContext) { self =>
       ServerInterceptors.intercept(
         UsersGrpc.bindService(new UsersImpl, executionContext),
         new ErrorHandler,
-        new Logging
+        new Logging,
+        TransmitStatusRuntimeExceptionInterceptor.instance()
       )
     ).build.start
     Logger.info("gRPC server started, listening on " + port)
@@ -79,6 +81,7 @@ class GrpcServer(executionContext: ExecutionContext) { self =>
     }
 
     override def list(request: RequestType, stream: StreamObserver[CwUserId]) = {
+      throw new RuntimeException("hoge")
       for (u <- users) {
         stream.onNext(u)
       }
