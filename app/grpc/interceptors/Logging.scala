@@ -10,7 +10,7 @@ import org.slf4j.MDC
 import io.grpc.{ServerInterceptor, ServerCall, ServerCallHandler, Metadata, Status}
 import io.grpc.{ForwardingServerCallListener, ForwardingServerCall}
 
-import grpc.util.{Logger, Tracking}
+import grpc.util.{Logger, MDCContext}
 
 // gRPCサーバ内でのユニークIDを付与し，リクエスト・レスポンスのログを吐く
 class Logging() extends ServerInterceptor {
@@ -21,7 +21,7 @@ class Logging() extends ServerInterceptor {
     next: ServerCallHandler[ReqT, RespT]): ServerCall.Listener[ReqT] = {
 
     // リクエストごとに固有のrequestIdを作る
-    val mdcContext: java.util.Map[String, String] = Tracking.buildMdcContext()
+    val mdcContext: java.util.Map[String, String] = MDCContext.buildMdcContext(headers)
     MDC.setContextMap(mdcContext)
 
     val wrapperCall: ServerCall[ReqT, RespT] = new ForwardingServerCall.SimpleForwardingServerCall[ReqT, RespT](serverCall) {

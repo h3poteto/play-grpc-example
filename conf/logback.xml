@@ -4,7 +4,7 @@
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%coloredLevel %logger{15} - [%X{trackingId}] %message%n%xException{10}</pattern>
+      <pattern>%coloredLevel %logger{15} - [%X{tracking_id}][%X{request_id}] %message%n%xException{10}</pattern>
     </encoder>
   </appender>
 

@@ -1,3 +1,4 @@
 project
 target
 client/ruby/lib
+client/ruby/vendor
