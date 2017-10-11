@@ -8,6 +8,7 @@ package grpc.interceptors
 
 import io.grpc.{ForwardingServerCall, ForwardingServerCallListener, Metadata, ServerCall, ServerCallHandler, ServerInterceptor, Status, StatusRuntimeException}
 import grpc.util.Logger
+import grpc.ValidationError
 
 class ErrorHandler extends ServerInterceptor {
   override def interceptCall[ReqT, RespT](
@@ -65,8 +66,12 @@ class ErrorHandler extends ServerInterceptor {
         // その結果client側では，GRPC::Unknownが出てしまう
         // そのため，ここでExceptionをgrpcのStatusにマッピングしてStatusRuntimeExceptionを投げ直す
         // 投げられたStatusRutnimeExceptionはTransmitStatusRuntimeExceptionInterceptorで拾われる
-        // TODO: switchでエラー種別によりStatusを変えたい
-        val status = Status.Code.INTERNAL.toStatus().withDescription(t.getMessage()).withCause(t)
+        var status: Status = null
+
+        t match {
+          case e: ValidationError => status = Status.Code.INVALID_ARGUMENT.toStatus().withDescription(t.getMessage()).withCause(t)
+          case _ => status = Status.Code.INTERNAL.toStatus().withDescription(t.getMessage()).withCause(t)
+        }
         Logger.error(status.toString())
         throw new StatusRuntimeException(status)
       }
