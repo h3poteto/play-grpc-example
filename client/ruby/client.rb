@@ -20,9 +20,9 @@ end
 
 def main
   stub = Users::Users::Stub.new("127.0.0.1:50051", :this_channel_is_insecure, interceptors: [RequestClientInterceptor.new])
-  if ARGV.size == 1
-    cw_user_id = stub.create(Users::CwUserId.new(id: ARGV[0].to_i))
-    puts cw_user_id.inspect
+  if ARGV.size == 2
+    user = stub.create(Users::User.new(id: ARGV[0].to_i, name: ARGV[1]))
+    puts user.inspect
   else
     stub.list(Users::RequestType.new).each do |x|
       puts x.inspect

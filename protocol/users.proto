@@ -4,13 +4,14 @@ package users;
 
 
 service Users {
-  rpc Create(CwUserId) returns (CwUserId) {};
-  rpc List(RequestType) returns (stream CwUserId) {};
+  rpc Create(User) returns (User) {};
+  rpc List(RequestType) returns (stream User) {};
 }
 
 message RequestType {
 }
 
-message CwUserId {
+message User {
   int64 id = 1;
+  string name = 2;
 }

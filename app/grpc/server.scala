@@ -5,7 +5,7 @@ import io.grpc.{Server, ServerBuilder, Status, StatusRuntimeException, ServerInt
 import io.grpc.stub.StreamObserver
 import io.grpc.util._
 
-import users.users.{RequestType, CwUserId, UsersGrpc}
+import users.users.{RequestType, User, UsersGrpc}
 import grpc.interceptors.{ErrorHandler, Logging}
 import grpc.util.Logger
 
@@ -44,7 +44,7 @@ class RunnerImpl @Inject() (actorSystem: ActorSystem)(implicit exec: ExecutionCo
 class GrpcServer(executionContext: ExecutionContext) { self =>
   private val port = sys.env.getOrElse("SERVER_PORT", "50051").asInstanceOf[String].toInt
   private[this] var server: Server = null
-  private var users: Array[CwUserId] = Array.empty
+  private var users: Array[User] = Array.empty
 
   def start(): Unit = {
     server = ServerBuilder.forPort(port).addService(
@@ -76,13 +76,13 @@ class GrpcServer(executionContext: ExecutionContext) { self =>
   }
 
   private class UsersImpl extends UsersGrpc.Users {
-    override def create(request: CwUserId): scala.concurrent.Future[CwUserId] = {
+    override def create(request: User): scala.concurrent.Future[User] = {
       Logger.info("writing")
       users = users :+ request
       Future.successful(request)
     }
 
-    override def list(request: RequestType, stream: StreamObserver[CwUserId]) = {
+    override def list(request: RequestType, stream: StreamObserver[User]) = {
       throw new RuntimeException("hoge")
       for (u <- users) {
         stream.onNext(u)
