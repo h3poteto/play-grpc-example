@@ -9,6 +9,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.12.3"
 
+val scalazVersion = "7.2.15"
+
 libraryDependencies ++= Seq(
   guice,
   jdbc,
@@ -19,7 +21,9 @@ libraryDependencies ++= Seq(
   "io.grpc" % "grpc-netty" % grpcJavaVersion,
   "com.trueaccord.scalapb" %% "scalapb-runtime" % scalapbVersion % "protobuf",
   "com.trueaccord.scalapb" %% "scalapb-runtime-grpc" % scalapbVersion,
-  "io.grpc" % "grpc-all" % grpcJavaVersion
+  "io.grpc" % "grpc-all" % grpcJavaVersion,
+  "org.scalaz" %% "scalaz-core" % scalazVersion
+
 )
 
 PB.targets in Compile := Seq(scalapb.gen() -> ((sourceManaged in Compile).value / "protobuf-scala"))

@@ -19,15 +19,18 @@ end
 
 
 def main
-  stub = Users::Users::Stub.new("127.0.0.1:50051", :this_channel_is_insecure, interceptors: [RequestClientInterceptor.new])
+  stub = Proto::Users::Stub.new("127.0.0.1:50051", :this_channel_is_insecure, interceptors: [RequestClientInterceptor.new])
   if ARGV.size == 1
-    user = stub.create(Users::User.new(id: ARGV[0].to_i))
+    user = stub.create(Proto::User.new(id: ARGV[0].to_i))
     puts user.inspect
   elsif ARGV.size == 2
-    user = stub.create(Users::User.new(id: ARGV[0].to_i, name: ARGV[1]))
+    user = stub.create(Proto::User.new(id: ARGV[0].to_i, name: ARGV[1]))
+    puts user.inspect
+  elsif ARGV.size == 3
+    user = stub.create(Proto::User.new(id: ARGV[0].to_i, name: ARGV[1], age: ARGV[2].to_i))
     puts user.inspect
   else
-    stub.list(Users::RequestType.new).each do |x|
+    stub.list(Proto::RequestType.new).each do |x|
       puts x.inspect
     end
   end

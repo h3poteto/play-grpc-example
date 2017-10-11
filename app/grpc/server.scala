@@ -5,7 +5,7 @@ import io.grpc.{Server, ServerBuilder, Status, StatusRuntimeException, ServerInt
 import io.grpc.stub.StreamObserver
 import io.grpc.util._
 
-import users.users.{RequestType, User, UsersGrpc}
+import proto.users.{RequestType, User, UsersGrpc}
 import grpc.interceptors.{ErrorHandler, Logging}
 import grpc.util.Logger
 
@@ -13,6 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import javax.inject.{Inject, Named}
 import akka.actor.ActorSystem
+import scalaz._
 
 trait Runner {
   def start(): Unit
@@ -78,12 +79,15 @@ class GrpcServer(executionContext: ExecutionContext) { self =>
   private class UsersImpl extends UsersGrpc.Users {
     override def create(request: User): scala.concurrent.Future[User] = {
       Logger.info("writing")
+      Validation.user(request) match {
+        case Success(_) => true
+        case Failure(e) => throw e.head
+      }
       users = users :+ request
       Future.successful(request)
     }
 
     override def list(request: RequestType, stream: StreamObserver[User]) = {
-      throw new RuntimeException("hoge")
       for (u <- users) {
         stream.onNext(u)
       }
