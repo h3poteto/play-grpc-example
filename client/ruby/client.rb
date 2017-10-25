@@ -15,6 +15,14 @@ class RequestClientInterceptor < GRPC::ClientInterceptor
       " and metadata: #{metadata}"
     yield
   end
+
+  def server_streamer(request:, call:, method:, metadata: {})
+    metadata['request_id'] = ::SecureRandom.uuid
+    p "Intercepted request/response call at method #{method}" \
+      " with request #{request} for call #{call}" \
+      " and metadata: #{metadata}"
+    yield
+  end
 end
 
 
