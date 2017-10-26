@@ -15,25 +15,44 @@ import javax.inject.{Inject, Named}
 import play.api.inject.ApplicationLifecycle
 import akka.actor.ActorSystem
 import scalaz._
+import play.api._
 
-trait Runner {
-  def start(): Unit
+
+trait Runner extends Runnable {
+  run()
+
+  final def run() = {
+    val app = application()
+    try {
+      task(app)
+    } finally {
+      Play.stop(app)
+    }
+  }
+
+  def task(app: Application)
+
+  def environment(): Mode = {
+    System.getProperty("play.mode") match {
+      case "Prod" => Mode.Prod
+      case _ => Mode.Dev
+    }
+  }
+
+  def application(): Application = {
+    val env = Environment(new java.io.File("."), this.getClass.getClassLoader, environment)
+    val context = ApplicationLoader.createContext(env)
+    val loader = ApplicationLoader(context)
+    loader.load(context)
+  }
 }
 
-class RunnerImpl @Inject() (actorSystem: ActorSystem, lifecycle: ApplicationLifecycle)(implicit exec: ExecutionContext) extends Runner {
-  val server = new GrpcServer(exec)
-
-  def start(): Unit = {
+object RunnerImpl extends App with Runner {
+  def task(app: Application) {
+    val exec = ExecutionContext.global
+    val server = new GrpcServer(exec)
     server.start()
     server.blockUnitShutdown()
-  }
-  // Playが終了するときに呼ばれる
-  // JVMが終了するタイミングではないかもしれない
-  lifecycle.addStopHook { () =>
-    Future.successful(server.stop())
-  }
-  actorSystem.scheduler.scheduleOnce(1.seconds) {
-    start()
   }
 }
 
