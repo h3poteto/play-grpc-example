@@ -4,10 +4,11 @@ import models.User
 import scalaz._
 import scalaz.syntax.validation._
 import scalaz.syntax.apply._
+import protocol.user.users
 
 
 object Validation {
-  def user(u: proto.users.User):Validation[NonEmptyList[ValidationError], User] = {
+  def user(u: users.User):Validation[NonEmptyList[ValidationError], User] = {
     // 両方共successだった場合に，Userのコンストラクタに値を渡してインスタンスを生成し，Successを返す
     (validateName(u.name) |@| validateAge(u.age.toInt))(User)
   }

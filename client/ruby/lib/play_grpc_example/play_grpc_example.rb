@@ -7,11 +7,17 @@ module PlayGrpcExample
     class User
       attr_accessor :stub
       def initialize
-        @stub = Proto::Users::Stub.new("127.0.0.1:50051", :this_channel_is_insecure, interceptors: [RequestClientInterceptor.new])
+        @stub = Protocol::User::Users::Stub.new("127.0.0.1:50051", :this_channel_is_insecure, interceptors: [RequestClientInterceptor.new])
       end
 
       def create(id:, name:, age:)
-        @stub.create(Proto::User.new(id: id, name: name, age: age))
+        @stub.create(Protocol::User::User.new(id: id, name: name, age: age))
+      end
+
+      def list
+        @stub.list(Protocol::User::RequestType.new).each do |u|
+          puts u.inspect
+        end
       end
     end
   end
