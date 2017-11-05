@@ -5,7 +5,7 @@ import io.grpc.{Server, ServerBuilder, Status, StatusRuntimeException, ServerInt
 import io.grpc.stub.StreamObserver
 import io.grpc.util._
 
-import proto.users.{RequestType, User, UsersGrpc}
+import protocol.user.users.{RequestType, User, UsersGrpc}
 import grpc.interceptors.{ErrorHandler, Logging}
 import grpc.util.Logger
 
